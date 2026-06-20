@@ -1,0 +1,48 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: var(--card-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+}
+
+.field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldActions {
+  display: flex;
+  align-items: end;
+}
+
+.label {
+  font-size: 0.85rem;
+}
+
+.input,
+.select {
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--card-color);
+}
+
+.error {
+  color: #b00020;
+  font-size: 0.85rem;
+}
+
+.formError {
+  color: #b00020;
+  font-weight: 600;
+}
