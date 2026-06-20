@@ -1,0 +1,45 @@
+.container {
+  padding: 12px;
+}
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.title {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.loading {
+  padding: 12px 0;
+}
+.error {
+  padding: 12px 0;
+  color: #b00020;
+}
+
+.tableWrap {
+  width: 100%;
+  overflow: auto;
+}
+
+.formSection {
+  margin-bottom: 16px;
+}
+
+.formSection h3 {
+  margin: 0 0 8px 0;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+}

@@ -1,0 +1,17 @@
+.container {
+  padding: 12px;
+}
+
+.title {
+  margin: 0 0 12px 0;
+}
+
+.loading {
+  padding: 12px 0;
+  color: var(--text-color);
+}
+
+.error {
+  padding: 12px 0;
+  color: #b00020;
+}

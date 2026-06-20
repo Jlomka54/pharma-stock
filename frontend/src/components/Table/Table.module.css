@@ -1,0 +1,21 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card-color);
+}
+
+.th,
+.td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.empty {
+  padding: 16px;
+  color: var(--text-color);
+}
