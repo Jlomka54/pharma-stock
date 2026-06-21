@@ -12,7 +12,7 @@
 }
 
 .tr:nth-child(even) {
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--muted-bg);
 }
 
 .empty {

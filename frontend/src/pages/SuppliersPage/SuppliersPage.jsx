@@ -39,30 +39,23 @@ export default function SuppliersPage() {
   }, [fetchSuppliers]);
 
   const mapToInitial = (s) => ({
-    SupplierName: s.name || s.title || "",
-    Phone: s.phone || s.tel || "",
-    Email: s.email || "",
-    Address: s.address || "",
+    SupplierName: s.SupplierName || s.name || s.title || "",
+    Phone: s.Phone || s.phone || s.tel || "",
+    Email: s.Email || s.email || "",
+    Address: s.Address || s.address || "",
   });
 
   const handleCreateOrUpdate = async (vals) => {
     try {
       if (editingSupplier) {
-        const id = editingSupplier.id ?? editingSupplier._id;
-        await updateSupplier(id, {
-          name: vals.name ?? vals.SupplierName,
-          phone: vals.phone ?? vals.Phone,
-          email: vals.email ?? vals.Email,
-          address: vals.address ?? vals.Address,
-        });
+        const id =
+          editingSupplier.SupplierId ??
+          editingSupplier.id ??
+          editingSupplier._id;
+        await updateSupplier(id, vals);
         setEditingSupplier(null);
       } else {
-        await createSupplier({
-          name: vals.name ?? vals.SupplierName,
-          phone: vals.phone ?? vals.Phone,
-          email: vals.email ?? vals.Email,
-          address: vals.address ?? vals.Address,
-        });
+        await createSupplier(vals);
       }
       await fetchSuppliers();
       setFormKey((k) => k + 1);
@@ -80,7 +73,7 @@ export default function SuppliersPage() {
     const ok = window.confirm("Удалить поставщика?");
     if (!ok) return;
     try {
-      await deleteSupplier(row.id ?? row._id);
+      await deleteSupplier(row.SupplierId ?? row.id ?? row._id);
       await fetchSuppliers();
     } catch (err) {
       const msg = err?.response?.data?.message || err?.message || String(err);
@@ -100,15 +93,27 @@ export default function SuppliersPage() {
   };
 
   const columns = [
-    { key: "id", title: "ID" },
+    { key: "SupplierId", title: "ID" },
     {
-      key: "name",
+      key: "SupplierName",
       title: "Название поставщика",
-      render: (r) => r.name ?? r.title ?? "-",
+      render: (r) => r.SupplierName ?? r.name ?? r.title ?? "-",
     },
-    { key: "phone", title: "Телефон", render: (r) => r.phone ?? r.tel ?? "-" },
-    { key: "email", title: "Email", render: (r) => r.email ?? "-" },
-    { key: "address", title: "Адрес", render: (r) => r.address ?? "-" },
+    {
+      key: "Phone",
+      title: "Телефон",
+      render: (r) => r.Phone ?? r.phone ?? r.tel ?? "-",
+    },
+    {
+      key: "Email",
+      title: "Email",
+      render: (r) => r.Email ?? r.email ?? "-",
+    },
+    {
+      key: "Address",
+      title: "Адрес",
+      render: (r) => r.Address ?? r.address ?? "-",
+    },
     {
       key: "actions",
       title: "Действия",
@@ -146,13 +151,7 @@ export default function SuppliersPage() {
             editingSupplier ? mapToInitial(editingSupplier) : undefined
           }
           onSubmit={async (vals) => {
-            const payload = {
-              name: vals.name ?? vals.SupplierName,
-              phone: vals.phone ?? vals.Phone,
-              email: vals.email ?? vals.Email,
-              address: vals.address ?? vals.Address,
-            };
-            await handleCreateOrUpdate(payload);
+            await handleCreateOrUpdate(vals);
           }}
           onCancel={() => {
             setEditingSupplier(null);

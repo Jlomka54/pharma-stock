@@ -8,13 +8,13 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-top-color: var(--primary-color, #1976d2);
+  border: 3px solid var(--muted-border);
+  border-top-color: var(--color-primary, #1976d2);
   animation: spin 1s linear infinite;
 }
 .text {
   font-size: 0.95rem;
-  color: var(--text-color, #111);
+  color: var(--text-color);
 }
 @keyframes spin {
   to {

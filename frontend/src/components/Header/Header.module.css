@@ -2,8 +2,8 @@
   display: flex;
   align-items: center;
   padding: 16px 24px;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--card-color);
+  border-bottom: none;
+  background: var(--bg-color);
 }
 
 .titleGroup {
@@ -14,10 +14,11 @@
 .title {
   margin: 0;
   font-size: 1.25rem;
+  color: var(--text-color);
 }
 
 .subtitle {
   margin: 2px 0 0 0;
   font-size: 0.875rem;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-muted);
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import styles from "./ProductsPage.module.css";
 import {
   getProducts,
+  getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -69,7 +70,8 @@ export default function ProductsPage() {
     setCreateError(null);
     try {
       if (editingProduct) {
-        const id = editingProduct.id ?? editingProduct._id;
+        const id =
+          editingProduct.ProductId ?? editingProduct.id ?? editingProduct._id;
         await updateProduct(id, values);
         setEditingProduct(null);
       } else {
@@ -90,46 +92,60 @@ export default function ProductsPage() {
   const boolIsTrue = (val) => val === 1 || val === "1" || val === true;
 
   const columns = [
-    { key: "id", title: "ID" },
+    { key: "ProductId", title: "ID" },
     {
       key: "name",
       title: "Название",
-      render: (r) => r.name || r.title || r.productName || "-",
+      render: (r) => r.ProductName ?? r.name ?? r.title ?? r.productName ?? "-",
     },
     {
       key: "category",
       title: "Категория",
-      render: (r) => r.category?.name || r.categoryName || r.category || "-",
+      render: (r) =>
+        r.CategoryName ??
+        r.category?.name ??
+        r.categoryName ??
+        r.category ??
+        "-",
     },
     {
       key: "supplier",
       title: "Поставщик",
-      render: (r) => r.supplier?.name || r.supplierName || r.supplier || "-",
+      render: (r) =>
+        r.SupplierName ??
+        r.supplier?.name ??
+        r.supplierName ??
+        r.supplier ??
+        "-",
     },
     {
       key: "price",
       title: "Цена",
       render: (r) => {
-        const p = Number(r.price ?? r.unitPrice ?? r.cost ?? 0) || 0;
+        const p = Number(r.Price ?? r.price ?? r.unitPrice ?? r.cost ?? 0) || 0;
         return formatCurrency(p);
       },
     },
     {
       key: "stock",
       title: "Остаток",
-      render: (r) => numFmt.format(r.stock ?? r.quantity ?? r.qty ?? 0),
+      render: (r) =>
+        numFmt.format(r.QuantityInStock ?? r.stock ?? r.quantity ?? r.qty ?? 0),
     },
     {
       key: "minStock",
       title: "Минимальный остаток",
       render: (r) =>
-        numFmt.format(r.minStock ?? r.min_stock ?? r.reorderLevel ?? 0),
+        numFmt.format(
+          r.MinQuantity ?? r.minStock ?? r.min_stock ?? r.reorderLevel ?? 0,
+        ),
     },
     {
       key: "expiry",
       title: "Срок годности",
       render: (r) => {
         const date =
+          r.ExpirationDate ||
           r.expiryDate ||
           r.expirationDate ||
           r.expiresAt ||
@@ -143,9 +159,11 @@ export default function ProductsPage() {
       key: "stockValue",
       title: "Стоимость на складе",
       render: (r) => {
-        const p = Number(r.price ?? r.unitPrice ?? r.cost ?? 0) || 0;
-        const q = Number(r.stock ?? r.quantity ?? r.qty ?? 0) || 0;
-        return formatCurrency(p * q);
+        const total =
+          Number(r.TotalValue ?? r.stockValue ?? 0) ||
+          (Number(r.Price ?? r.price ?? 0) || 0) *
+            (Number(r.QuantityInStock ?? r.stock ?? r.quantity ?? 0) || 0);
+        return formatCurrency(total);
       },
     },
     {
@@ -173,16 +191,29 @@ export default function ProductsPage() {
   const [editingProduct, setEditingProduct] = useState(null);
 
   const mapToInitial = (r) => ({
-    ProductName: r.name || r.title || r.productName || "",
+    ProductId: r.ProductId ?? r.id ?? r._id ?? "",
+    ProductName: r.ProductName || r.name || r.title || r.productName || "",
     CategoryId:
-      r.category?.id ?? r.categoryId ?? r.category ?? r.categoryName ?? "",
+      r.CategoryId ??
+      r.category?.id ??
+      r.categoryId ??
+      r.category ??
+      r.categoryName ??
+      "",
     SupplierId:
-      r.supplier?.id ?? r.supplierId ?? r.supplier ?? r.supplierName ?? "",
-    Price: r.price ?? r.unitPrice ?? r.cost ?? "",
-    QuantityInStock: r.stock ?? r.quantity ?? r.qty ?? "",
-    MinQuantity: r.minStock ?? r.min_stock ?? r.reorderLevel ?? "",
+      r.SupplierId ??
+      r.supplier?.id ??
+      r.supplierId ??
+      r.supplier ??
+      r.supplierName ??
+      "",
+    Price: r.Price ?? r.price ?? r.unitPrice ?? r.cost ?? "",
+    QuantityInStock: r.QuantityInStock ?? r.stock ?? r.quantity ?? r.qty ?? "",
+    MinQuantity:
+      r.MinQuantity ?? r.minStock ?? r.min_stock ?? r.reorderLevel ?? "",
     ExpirationDate: (() => {
       const date =
+        r.ExpirationDate ||
         r.expiryDate ||
         r.expirationDate ||
         r.expiresAt ||
@@ -203,16 +234,26 @@ export default function ProductsPage() {
     })(),
   });
 
-  const handleEditClick = (row) => {
-    setEditingProduct(row);
-    setFormKey((k) => k + 1);
+  const handleEditClick = async (row) => {
+    try {
+      const id = row.ProductId ?? row.id ?? row._id;
+      if (!id) {
+        setEditingProduct(row);
+      } else {
+        const fullProduct = await getProductById(id);
+        setEditingProduct(fullProduct || row);
+      }
+      setFormKey((k) => k + 1);
+    } catch (err) {
+      alert(err?.message || "Ошибка при загрузке товара");
+    }
   };
 
   const handleDeleteClick = async (row) => {
     const ok = window.confirm("Удалить товар?");
     if (!ok) return;
     try {
-      await deleteProduct(row.id ?? row._id);
+      await deleteProduct(row.ProductId ?? row.id ?? row._id);
       await fetchProducts();
     } catch (err) {
       alert(err?.message || "Ошибка при удалении");

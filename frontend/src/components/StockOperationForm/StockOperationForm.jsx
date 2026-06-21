@@ -52,12 +52,12 @@ export default function StockOperationForm({
     setSubmitting(true);
     try {
       const payload = {
-        productId: values.ProductId,
-        userId: values.UserId || 1,
-        operationType: values.OperationType,
-        quantity: Number(values.Quantity),
-        operationDate: new Date(values.OperationDate).toISOString(),
-        comment: values.Comment || undefined,
+        ProductId: values.ProductId,
+        UserId: values.UserId || 1,
+        OperationType: values.OperationType,
+        Quantity: Number(values.Quantity),
+        OperationDate: new Date(values.OperationDate).toISOString(),
+        Comment: values.Comment || undefined,
       };
       await onSubmit(payload);
       setValues({
@@ -83,8 +83,11 @@ export default function StockOperationForm({
           >
             <option value="">-- выберите --</option>
             {products.map((p) => (
-              <option key={p.id ?? p._id} value={p.id ?? p._id}>
-                {p.name ?? p.title ?? p.productName}
+              <option
+                key={p.ProductId ?? p.id ?? p._id}
+                value={p.ProductId ?? p.id ?? p._id}
+              >
+                {p.ProductName ?? p.name ?? p.title ?? p.productName}
               </option>
             ))}
           </select>

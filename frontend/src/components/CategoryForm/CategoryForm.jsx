@@ -40,8 +40,8 @@ export default function CategoryForm({
     setSubmitting(true);
     try {
       await onSubmit({
-        name: values.CategoryName,
-        description: values.Description,
+        CategoryName: values.CategoryName,
+        Description: values.Description,
       });
       setValues({ ...empty });
       setErrors({});

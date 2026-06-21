@@ -57,13 +57,13 @@ export default function ProductForm({
     setSubmitting(true);
     try {
       await onSubmit({
-        name: values.ProductName,
-        categoryId: values.CategoryId,
-        supplierId: values.SupplierId,
-        price: Number(values.Price),
-        quantity: Number(values.QuantityInStock),
-        minQuantity: Number(values.MinQuantity),
-        expirationDate: values.ExpirationDate || null,
+        ProductName: values.ProductName,
+        CategoryId: values.CategoryId,
+        SupplierId: values.SupplierId,
+        Price: Number(values.Price),
+        QuantityInStock: Number(values.QuantityInStock),
+        MinQuantity: Number(values.MinQuantity),
+        ExpirationDate: values.ExpirationDate || null,
       });
       // on success, clear form
       setValues({ ...emptyValues });
@@ -105,10 +105,10 @@ export default function ProductForm({
             <option value="">— Выберите —</option>
             {categories.map((c) => (
               <option
-                key={c.id ?? c._id ?? c.value}
-                value={c.id ?? c._id ?? c.value}
+                key={c.CategoryId ?? c.id ?? c._id ?? c.value}
+                value={c.CategoryId ?? c.id ?? c._id ?? c.value}
               >
-                {c.name ?? c.title ?? c.label}
+                {c.CategoryName ?? c.name ?? c.title ?? c.label}
               </option>
             ))}
           </select>
@@ -130,10 +130,10 @@ export default function ProductForm({
             <option value="">— Выберите —</option>
             {suppliers.map((s) => (
               <option
-                key={s.id ?? s._id ?? s.value}
-                value={s.id ?? s._id ?? s.value}
+                key={s.SupplierId ?? s.id ?? s._id ?? s.value}
+                value={s.SupplierId ?? s.id ?? s._id ?? s.value}
               >
-                {s.name ?? s.title ?? s.label}
+                {s.SupplierName ?? s.name ?? s.title ?? s.label}
               </option>
             ))}
           </select>

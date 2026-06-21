@@ -42,10 +42,10 @@ export default function SupplierForm({
     setSubmitting(true);
     try {
       await onSubmit({
-        name: values.SupplierName,
-        phone: values.Phone,
-        email: values.Email,
-        address: values.Address,
+        SupplierName: values.SupplierName,
+        Phone: values.Phone,
+        Email: values.Email,
+        Address: values.Address,
       });
       setValues({ ...empty });
       setErrors({});

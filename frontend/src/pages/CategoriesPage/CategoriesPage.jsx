@@ -37,24 +37,21 @@ export default function CategoriesPage() {
   }, [fetchCategories]);
 
   const mapToInitial = (cat) => ({
-    CategoryName: cat.name || cat.title || "",
-    Description: cat.description || cat.desc || "",
+    CategoryName: cat.CategoryName || cat.name || cat.title || "",
+    Description: cat.Description || cat.description || cat.desc || "",
   });
 
   const handleCreateOrUpdate = async (vals) => {
     try {
       if (editingCategory) {
-        const id = editingCategory.id ?? editingCategory._id;
-        await updateCategory(id, {
-          name: vals.name ?? vals.CategoryName,
-          description: vals.description ?? vals.Description,
-        });
+        const id =
+          editingCategory.CategoryId ??
+          editingCategory.id ??
+          editingCategory._id;
+        await updateCategory(id, vals);
         setEditingCategory(null);
       } else {
-        await createCategory({
-          name: vals.name ?? vals.CategoryName,
-          description: vals.description ?? vals.Description,
-        });
+        await createCategory(vals);
       }
       await fetchCategories();
       setFormKey((k) => k + 1);
@@ -72,7 +69,7 @@ export default function CategoriesPage() {
     const ok = window.confirm("Удалить категорию?");
     if (!ok) return;
     try {
-      await deleteCategory(row.id ?? row._id);
+      await deleteCategory(row.CategoryId ?? row.id ?? row._id);
       await fetchCategories();
     } catch (err) {
       const msg = err?.response?.data?.message || err?.message || String(err);
@@ -92,16 +89,16 @@ export default function CategoriesPage() {
   };
 
   const columns = [
-    { key: "id", title: "ID" },
+    { key: "CategoryId", title: "ID" },
     {
-      key: "name",
+      key: "CategoryName",
       title: "Название категории",
-      render: (r) => r.name ?? r.title ?? "-",
+      render: (r) => r.CategoryName ?? r.name ?? r.title ?? "-",
     },
     {
-      key: "description",
+      key: "Description",
       title: "Описание",
-      render: (r) => r.description ?? r.desc ?? "-",
+      render: (r) => r.Description ?? r.description ?? r.desc ?? "-",
     },
     {
       key: "actions",
@@ -140,11 +137,7 @@ export default function CategoriesPage() {
             editingCategory ? mapToInitial(editingCategory) : undefined
           }
           onSubmit={async (vals) => {
-            const payload = {
-              name: vals.name ?? vals.CategoryName,
-              description: vals.description ?? vals.Description,
-            };
-            await handleCreateOrUpdate(payload);
+            await handleCreateOrUpdate(vals);
           }}
           onCancel={() => {
             setEditingCategory(null);

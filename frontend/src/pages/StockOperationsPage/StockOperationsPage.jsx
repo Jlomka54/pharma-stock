@@ -53,48 +53,57 @@ export default function StockOperationsPage() {
   };
 
   const columns = [
-    { key: "id", title: "ID" },
+    { key: "OperationId", title: "ID" },
     {
-      key: "product",
+      key: "ProductName",
       title: "Товар",
       render: (r) =>
+        r.ProductName ??
         r.product?.name ??
-        products.find((p) => (p.id ?? p._id) === (r.productId ?? r.product?.id))
-          ?.name ??
-        (r.productId || "-"),
+        products.find(
+          (p) =>
+            (p.id ?? p._id ?? p.ProductId) ===
+            (r.productId ?? r.product?.id ?? r.ProductId),
+        )?.ProductName ??
+        r.productId ??
+        "-",
     },
     {
-      key: "user",
+      key: "Username",
       title: "Пользователь",
-      render: (r) => r.user?.name ?? r.userId ?? r.user ?? "1",
+      render: (r) => r.Username ?? r.user?.name ?? r.userId ?? r.user ?? "1",
     },
     {
-      key: "type",
+      key: "OperationType",
       title: "Тип операции",
       render: (r) =>
-        r.operationType === "income"
+        r.OperationType === "income"
           ? "Приход"
-          : r.operationType === "outcome"
+          : r.OperationType === "outcome"
             ? "Расход"
-            : r.operationType === "writeoff"
+            : r.OperationType === "writeoff"
               ? "Списание"
-              : r.operationType,
+              : r.OperationType,
     },
     {
-      key: "quantity",
+      key: "Quantity",
       title: "Количество",
-      render: (r) => r.quantity ?? r.qty ?? "-",
+      render: (r) => r.Quantity ?? r.quantity ?? r.qty ?? "-",
     },
     {
-      key: "date",
+      key: "OperationDate",
       title: "Дата",
-      render: (r) =>
-        new Date(r.operationDate || r.createdAt || r.date).toLocaleString(),
+      render: (r) => {
+        const dateValue =
+          r.OperationDate || r.operationDate || r.createdAt || r.date;
+        const date = new Date(dateValue);
+        return Number.isNaN(date.getTime()) ? "-" : date.toLocaleString();
+      },
     },
     {
-      key: "comment",
+      key: "Comment",
       title: "Комментарий",
-      render: (r) => r.comment ?? r.note ?? "-",
+      render: (r) => r.Comment ?? r.comment ?? r.note ?? "-",
     },
   ];
 

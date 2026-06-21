@@ -18,15 +18,26 @@ export default function Table({ columns = [], data = [] }) {
         </tr>
       </thead>
       <tbody>
-        {data.map((row, rowIndex) => (
-          <tr key={row.id || rowIndex} className={styles.tr}>
-            {columns.map((col) => (
-              <td key={col.key} className={styles.td}>
-                {col.render ? col.render(row) : row[col.key]}
-              </td>
-            ))}
-          </tr>
-        ))}
+        {data.map((row, rowIndex) => {
+          const rowKey =
+            row.id ??
+            row._id ??
+            row.ProductId ??
+            row.CategoryId ??
+            row.SupplierId ??
+            row.OperationId ??
+            row.UserId ??
+            rowIndex;
+          return (
+            <tr key={rowKey} className={styles.tr}>
+              {columns.map((col) => (
+                <td key={col.key} className={styles.td}>
+                  {col.render ? col.render(row) : row[col.key]}
+                </td>
+              ))}
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

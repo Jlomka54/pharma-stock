@@ -14,9 +14,15 @@
 
 .link {
   display: block;
+  width: 100%;
   padding: 8px 12px;
+  border: 0;
   border-radius: var(--border-radius);
+  background: transparent;
   color: var(--text-color);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
 }
 
 .active {
