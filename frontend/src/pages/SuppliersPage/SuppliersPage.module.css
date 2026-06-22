@@ -1,38 +1,9 @@
-.container {
-  padding: 12px;
-}
-.headerRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-.title {
-  margin: 0;
-}
-.actions {
-  display: flex;
-  gap: 8px;
-}
-.formSection {
-  margin-bottom: 16px;
-}
-.formSection h3 {
-  margin: 0 0 8px 0;
-}
-.tableWrap {
-  width: 100%;
-  overflow: auto;
-}
-.loading {
-  padding: 12px 0;
-}
-.error {
-  padding: 12px 0;
-  color: #b00020;
-}
-.actionButtons {
-  display: flex;
-  gap: 8px;
-}
+.container { padding: 4px 0; }
+.pageHeader { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
+.title { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+.subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+.formSection { background: var(--card-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); margin-bottom: 24px; overflow: hidden; }
+.formSectionHeader { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border-color); background: var(--muted-bg); }
+.formSectionTitle { font-size: 14px; font-weight: 600; }
+.formSectionBody { padding: 20px; }
+.actionButtons { display: flex; gap: 6px; }

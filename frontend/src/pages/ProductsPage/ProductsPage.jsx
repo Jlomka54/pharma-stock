@@ -1,11 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import styles from "./ProductsPage.module.css";
 import {
-  getProducts,
-  getProductById,
-  createProduct,
-  updateProduct,
-  deleteProduct,
+  getProducts, getProductById, createProduct, updateProduct, deleteProduct,
 } from "../../services/productService";
 import Table from "../../components/Table/Table";
 import Button from "../../components/Button/Button";
@@ -22,56 +18,39 @@ export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [formKey, setFormKey] = useState(0);
+  const [createError, setCreateError] = useState(null);
 
   const fetchProducts = useCallback(() => {
     setLoading(true);
     setError(null);
     return getProducts()
       .then((data) => {
-        setProducts(
-          Array.isArray(data) ? data : data?.items || data?.data || [],
-        );
+        setProducts(Array.isArray(data) ? data : data?.items || data?.data || []);
       })
-      .catch((err) => {
-        setError(err?.message || "Ошибка при загрузке списка товаров");
-      })
+      .catch((err) => setError(err?.message || "Ошибка при загрузке товаров"))
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
-  // metadata for product creation
-  const [categories, setCategories] = useState([]);
-  const [suppliers, setSuppliers] = useState([]);
-  const [loadingMeta, setLoadingMeta] = useState(false);
-  const [createError, setCreateError] = useState(null);
-  const [creating, setCreating] = useState(false);
-  const [formKey, setFormKey] = useState(0);
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
   useEffect(() => {
-    setLoadingMeta(true);
     Promise.all([getCategories(), getSuppliers()])
       .then(([cats, sups]) => {
-        setCategories(
-          Array.isArray(cats) ? cats : cats?.items || cats?.data || [],
-        );
-        setSuppliers(
-          Array.isArray(sups) ? sups : sups?.items || sups?.data || [],
-        );
+        setCategories(Array.isArray(cats) ? cats : cats?.items || cats?.data || []);
+        setSuppliers(Array.isArray(sups) ? sups : sups?.items || sups?.data || []);
       })
-      .catch(() => {})
-      .finally(() => setLoadingMeta(false));
+      .catch(() => {});
   }, []);
 
-  const handleCreate = async (values) => {
-    setCreating(true);
+  const handleCreateOrUpdate = async (values) => {
     setCreateError(null);
     try {
       if (editingProduct) {
-        const id =
-          editingProduct.ProductId ?? editingProduct.id ?? editingProduct._id;
+        const id = editingProduct.ProductId ?? editingProduct.id ?? editingProduct._id;
         await updateProduct(id, values);
         setEditingProduct(null);
       } else {
@@ -82,176 +61,24 @@ export default function ProductsPage() {
     } catch (err) {
       setCreateError(err?.message || "Ошибка при сохранении товара");
       throw err;
-    } finally {
-      setCreating(false);
     }
   };
-
-  const numFmt = new Intl.NumberFormat("ru-RU");
-
-  const boolIsTrue = (val) => val === 1 || val === "1" || val === true;
-
-  const columns = [
-    { key: "ProductId", title: "ID" },
-    {
-      key: "name",
-      title: "Название",
-      render: (r) => r.ProductName ?? r.name ?? r.title ?? r.productName ?? "-",
-    },
-    {
-      key: "category",
-      title: "Категория",
-      render: (r) =>
-        r.CategoryName ??
-        r.category?.name ??
-        r.categoryName ??
-        r.category ??
-        "-",
-    },
-    {
-      key: "supplier",
-      title: "Поставщик",
-      render: (r) =>
-        r.SupplierName ??
-        r.supplier?.name ??
-        r.supplierName ??
-        r.supplier ??
-        "-",
-    },
-    {
-      key: "price",
-      title: "Цена",
-      render: (r) => {
-        const p = Number(r.Price ?? r.price ?? r.unitPrice ?? r.cost ?? 0) || 0;
-        return formatCurrency(p);
-      },
-    },
-    {
-      key: "stock",
-      title: "Остаток",
-      render: (r) =>
-        numFmt.format(r.QuantityInStock ?? r.stock ?? r.quantity ?? r.qty ?? 0),
-    },
-    {
-      key: "minStock",
-      title: "Минимальный остаток",
-      render: (r) =>
-        numFmt.format(
-          r.MinQuantity ?? r.minStock ?? r.min_stock ?? r.reorderLevel ?? 0,
-        ),
-    },
-    {
-      key: "expiry",
-      title: "Срок годности",
-      render: (r) => {
-        const date =
-          r.ExpirationDate ||
-          r.expiryDate ||
-          r.expirationDate ||
-          r.expiresAt ||
-          r.expiry ||
-          r.expireDate;
-        if (!date) return "-";
-        return formatDate(date).split(",")[0] || formatDate(date);
-      },
-    },
-    {
-      key: "stockValue",
-      title: "Стоимость на складе",
-      render: (r) => {
-        const total =
-          Number(r.TotalValue ?? r.stockValue ?? 0) ||
-          (Number(r.Price ?? r.price ?? 0) || 0) *
-            (Number(r.QuantityInStock ?? r.stock ?? r.quantity ?? 0) || 0);
-        return formatCurrency(total);
-      },
-    },
-    {
-      key: "status",
-      title: "Статус",
-      render: (r) => getStockStatus(r),
-    },
-    {
-      key: "actions",
-      title: "Действия",
-      render: (r) => (
-        <div className={styles.actionButtons}>
-          <Button variant="secondary" onClick={() => handleEditClick(r)}>
-            Редактировать
-          </Button>
-          <Button variant="danger" onClick={() => handleDeleteClick(r)}>
-            Удалить
-          </Button>
-        </div>
-      ),
-    },
-  ];
-
-  // edit / delete handlers
-  const [editingProduct, setEditingProduct] = useState(null);
-
-  const mapToInitial = (r) => ({
-    ProductId: r.ProductId ?? r.id ?? r._id ?? "",
-    ProductName: r.ProductName || r.name || r.title || r.productName || "",
-    CategoryId:
-      r.CategoryId ??
-      r.category?.id ??
-      r.categoryId ??
-      r.category ??
-      r.categoryName ??
-      "",
-    SupplierId:
-      r.SupplierId ??
-      r.supplier?.id ??
-      r.supplierId ??
-      r.supplier ??
-      r.supplierName ??
-      "",
-    Price: r.Price ?? r.price ?? r.unitPrice ?? r.cost ?? "",
-    QuantityInStock: r.QuantityInStock ?? r.stock ?? r.quantity ?? r.qty ?? "",
-    MinQuantity:
-      r.MinQuantity ?? r.minStock ?? r.min_stock ?? r.reorderLevel ?? "",
-    ExpirationDate: (() => {
-      const date =
-        r.ExpirationDate ||
-        r.expiryDate ||
-        r.expirationDate ||
-        r.expiresAt ||
-        r.expiry ||
-        r.expireDate;
-      if (!date) return "";
-      try {
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return String(date);
-        // format as yyyy-mm-dd for input
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, "0");
-        const dd = String(d.getDate()).padStart(2, "0");
-        return `${yyyy}-${mm}-${dd}`;
-      } catch {
-        return String(date);
-      }
-    })(),
-  });
 
   const handleEditClick = async (row) => {
     try {
       const id = row.ProductId ?? row.id ?? row._id;
-      if (!id) {
-        setEditingProduct(row);
-      } else {
-        const fullProduct = await getProductById(id);
-        setEditingProduct(fullProduct || row);
-      }
+      const fullProduct = id ? (await getProductById(id)) || row : row;
+      setEditingProduct(fullProduct);
       setFormKey((k) => k + 1);
-    } catch (err) {
-      alert(err?.message || "Ошибка при загрузке товара");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      setEditingProduct(row);
+      setFormKey((k) => k + 1);
     }
   };
 
   const handleDeleteClick = async (row) => {
-    const ok = window.confirm("Удалить товар?");
-    if (!ok) return;
+    if (!window.confirm("Удалить товар?")) return;
     try {
       await deleteProduct(row.ProductId ?? row.id ?? row._id);
       await fetchProducts();
@@ -260,52 +87,142 @@ export default function ProductsPage() {
     }
   };
 
+  const handleCancelEdit = () => {
+    setEditingProduct(null);
+    setCreateError(null);
+    setFormKey((k) => k + 1);
+  };
+
+  const mapToInitial = (r) => ({
+    ProductName: r.ProductName || r.name || "",
+    CategoryId: r.CategoryId ?? r.category?.id ?? r.categoryId ?? "",
+    SupplierId: r.SupplierId ?? r.supplier?.id ?? r.supplierId ?? "",
+    Price: r.Price ?? r.price ?? "",
+    QuantityInStock: r.QuantityInStock ?? r.stock ?? r.quantity ?? "",
+    MinQuantity: r.MinQuantity ?? r.minStock ?? r.min_stock ?? "",
+    ExpirationDate: (() => {
+      const d = r.ExpirationDate || r.expiryDate || r.expirationDate;
+      if (!d) return "";
+      try {
+        const dt = new Date(d);
+        if (isNaN(dt.getTime())) return String(d);
+        return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
+      } catch { return String(d); }
+    })(),
+  });
+
+  const numFmt = new Intl.NumberFormat("ru-RU");
+
+  const columns = [
+    { key: "ProductId", title: "ID" },
+    {
+      key: "name", title: "Название",
+      render: (r) => <strong>{r.ProductName ?? r.name ?? "—"}</strong>,
+    },
+    {
+      key: "category", title: "Категория",
+      render: (r) => r.CategoryName ?? r.category?.name ?? r.categoryName ?? "—",
+    },
+    {
+      key: "supplier", title: "Поставщик",
+      render: (r) => r.SupplierName ?? r.supplier?.name ?? r.supplierName ?? "—",
+    },
+    {
+      key: "price", title: "Цена",
+      render: (r) => formatCurrency(Number(r.Price ?? r.price ?? 0)),
+    },
+    {
+      key: "stock", title: "Остаток",
+      render: (r) => numFmt.format(r.QuantityInStock ?? r.stock ?? 0),
+    },
+    {
+      key: "minStock", title: "Мин. остаток",
+      render: (r) => numFmt.format(r.MinQuantity ?? r.minStock ?? 0),
+    },
+    {
+      key: "expiry", title: "Срок годности",
+      render: (r) => {
+        const d = r.ExpirationDate || r.expiryDate;
+        if (!d) return "—";
+        return formatDate(d).split(",")[0] || formatDate(d);
+      },
+    },
+    {
+      key: "status", title: "Статус",
+      render: (r) => {
+        const status = getStockStatus(r);
+        const colors = {
+          "Норма": { color: "#0e9f6e", bg: "#f0fdf4" },
+          "Низкий остаток": { color: "#ff8800", bg: "#fff8ee" },
+          "Критически мало": { color: "#e02424", bg: "#fef2f2" },
+          "Просрочен": { color: "#7c3aed", bg: "#f5f3ff" },
+        };
+        const c = colors[status] || { color: "#64748b", bg: "#f1f5f9" };
+        return (
+          <span style={{
+            display: "inline-block",
+            padding: "3px 10px",
+            borderRadius: "20px",
+            fontSize: "12px",
+            fontWeight: 600,
+            color: c.color,
+            background: c.bg,
+          }}>
+            {status}
+          </span>
+        );
+      },
+    },
+    {
+      key: "actions", title: "Действия",
+      render: (r) => (
+        <div className={styles.actionButtons}>
+          <Button variant="secondary" onClick={() => handleEditClick(r)}>Редактировать</Button>
+          <Button variant="danger" onClick={() => handleDeleteClick(r)}>Удалить</Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className={styles.container}>
-      <div className={styles.headerRow}>
-        <h2 className={styles.title}>Медицинские товары</h2>
-        <div className={styles.actions}>
-          <Button onClick={fetchProducts} variant="secondary">
-            Обновить
-          </Button>
+      <div className={styles.pageHeader}>
+        <div>
+          <h2 className={styles.title}>Медицинские товары</h2>
+          <p className={styles.subtitle}>Полный список препаратов и продуктов</p>
         </div>
+        <Button onClick={fetchProducts} variant="secondary">Обновить</Button>
       </div>
 
       <div className={styles.formSection}>
-        <h3>Создать товар</h3>
-        {createError && <div className={styles.error}>{createError}</div>}
-        <ProductForm
-          key={formKey}
-          onSubmit={handleCreate}
-          onCancel={() => {
-            setEditingProduct(null);
-            setFormKey((k) => k + 1);
-          }}
-          initialValues={
-            editingProduct ? mapToInitial(editingProduct) : undefined
-          }
-          categories={categories}
-          suppliers={suppliers}
-          submitText={
-            editingProduct
-              ? creating
-                ? "Сохранение..."
-                : "Сохранить изменения"
-              : creating
-                ? "Создание..."
-                : "Создать"
-          }
-        />
+        <div className={styles.formSectionHeader}>
+          <span className={styles.formSectionTitle}>
+            {editingProduct ? "✏️ Редактировать товар" : "➕ Новый товар"}
+          </span>
+          {editingProduct && (
+            <Button variant="secondary" onClick={handleCancelEdit}>Отменить</Button>
+          )}
+        </div>
+        <div className={styles.formSectionBody}>
+          {createError && <div style={{ marginBottom: 12 }}><ErrorMessage message={createError} /></div>}
+          <ProductForm
+            key={formKey}
+            onSubmit={handleCreateOrUpdate}
+            onCancel={editingProduct ? handleCancelEdit : undefined}
+            initialValues={editingProduct ? mapToInitial(editingProduct) : undefined}
+            categories={categories}
+            suppliers={suppliers}
+            submitText={editingProduct ? "Сохранить изменения" : "Создать"}
+          />
+        </div>
       </div>
 
       {loading ? (
-        <Loader />
+        <Loader text="Загрузка товаров..." />
       ) : error ? (
         <ErrorMessage message={error} />
       ) : (
-        <div className={styles.tableWrap}>
-          <Table columns={columns} data={products} />
-        </div>
+        <Table columns={columns} data={products} />
       )}
     </div>
   );

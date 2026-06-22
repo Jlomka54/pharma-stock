@@ -1,3 +1,40 @@
 .container {
-  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+}
+.code {
+  font-size: 80px;
+  font-weight: 800;
+  color: var(--border-color);
+  line-height: 1;
+  letter-spacing: -4px;
+}
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 16px;
+}
+.text {
+  color: var(--text-muted);
+  margin-top: 8px;
+  font-size: 14px;
+}
+.link {
+  margin-top: 24px;
+  display: inline-block;
+  padding: 10px 20px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+  font-size: 14px;
+  transition: background var(--transition);
+  text-decoration: none;
+}
+.link:hover {
+  background: var(--color-primary-hover);
 }

@@ -1,24 +1,33 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .label {
-  font-size: 0.9rem;
-  color: var(--text-color);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-muted);
 }
 
 .input {
-  padding: 8px 10px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
+  padding: 9px 12px;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
   background: var(--card-color);
   color: var(--text-color);
+  font-size: 14px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  width: 100%;
 }
 
 .input:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.08);
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
 }

@@ -1,7 +1,26 @@
 .error {
-  padding: 10px;
-  border: 1px solid #f5c6cb;
-  background: #f8d7da;
-  color: #721c24;
-  border-radius: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid #fca5a5;
+  background: #fef2f2;
+  color: #991b1b;
+  border-radius: var(--border-radius-sm);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.error::before {
+  content: '⚠';
+  flex-shrink: 0;
+  font-size: 15px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .error {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+  }
 }

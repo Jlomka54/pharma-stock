@@ -1,23 +1,27 @@
 .wrapper {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  color: var(--text-muted);
 }
+
 .spinner {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  border: 3px solid var(--muted-border);
-  border-top-color: var(--color-primary, #1976d2);
-  animation: spin 1s linear infinite;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--color-primary);
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
 }
+
 .text {
-  font-size: 0.95rem;
-  color: var(--text-color);
+  font-size: 14px;
+  color: var(--text-muted);
 }
+
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }

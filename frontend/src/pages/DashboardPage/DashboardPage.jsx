@@ -28,107 +28,73 @@ export default function DashboardPage() {
         if (!mounted) return;
         setLoading(false);
       });
-
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
 
   const s = summary || {};
-  const pick = (...keys) => {
-    for (const k of keys) {
-      if (s[k] !== undefined && s[k] !== null) return s[k];
-    }
-    return undefined;
-  };
-
-  const totalProducts = pick(
-    "totalProducts",
-    "products",
-    "productsCount",
-    "total_products",
-    "countProducts",
-  );
-  const totalCategories = pick(
-    "totalCategories",
-    "categories",
-    "categoriesCount",
-    "total_categories",
-  );
-  const totalSuppliers = pick(
-    "totalSuppliers",
-    "suppliers",
-    "suppliersCount",
-    "total_suppliers",
-  );
-  const totalUnits = pick(
-    "totalUnits",
-    "units",
-    "totalUnitsInStock",
-    "unitsCount",
-    "total_units",
-  );
-  const totalValue = pick(
-    "totalValue",
-    "total_value",
-    "inventoryValue",
-    "totalInventoryValue",
-    "value",
-    "stockValue",
-  );
-  const lowStockCount = pick(
-    "lowStock",
-    "lowStockCount",
-    "productsLowStock",
-    "low_stock",
-  );
-  const expiredCount = pick(
-    "expired",
-    "expiredCount",
-    "expiredProducts",
-    "expired_products",
-  );
-
   const numFmt = new Intl.NumberFormat("ru-RU");
-  const currFmt = (v) => formatCurrency(v);
+
+  // Бэкенд возвращает: totalProducts, totalCategories, totalSuppliers,
+  // totalStockQuantity, totalWarehouseValue, lowStockCount, expiredProductsCount
+  const totalProducts = s.totalProducts ?? s.products ?? s.productsCount ?? null;
+  const totalCategories = s.totalCategories ?? s.categories ?? null;
+  const totalSuppliers = s.totalSuppliers ?? s.suppliers ?? null;
+  const totalUnits = s.totalStockQuantity ?? s.totalUnits ?? s.units ?? null;
+  const totalValue = s.totalWarehouseValue ?? s.totalValue ?? s.inventoryValue ?? null;
+  const lowStockCount = s.lowStockCount ?? s.lowStock ?? null;
+  const expiredCount = s.expiredProductsCount ?? s.expiredCount ?? null;
 
   const cards = [
     {
+      icon: "💊",
       title: "Всего товаров",
-      value: totalProducts != null ? numFmt.format(totalProducts) : "-",
+      value: totalProducts != null ? numFmt.format(totalProducts) : "—",
+      description: "позиций в базе",
     },
     {
-      title: "Категорий",
-      value: totalCategories != null ? numFmt.format(totalCategories) : "-",
+      icon: "🗂",
+      title: "Категории",
+      value: totalCategories != null ? numFmt.format(totalCategories) : "—",
     },
     {
-      title: "Поставщиков",
-      value: totalSuppliers != null ? numFmt.format(totalSuppliers) : "-",
+      icon: "🏭",
+      title: "Поставщики",
+      value: totalSuppliers != null ? numFmt.format(totalSuppliers) : "—",
     },
     {
+      icon: "📦",
       title: "Единиц на складе",
-      value: totalUnits != null ? numFmt.format(totalUnits) : "-",
+      value: totalUnits != null ? numFmt.format(totalUnits) : "—",
     },
     {
-      title: "Общая стоимость склада",
-      value: totalValue != null ? currFmt(totalValue) : "-",
+      icon: "💰",
+      title: "Стоимость склада",
+      value: totalValue != null ? formatCurrency(totalValue) : "—",
+      description: "суммарная стоимость",
     },
     {
-      title: "Товары с низким остатком",
-      value: lowStockCount != null ? numFmt.format(lowStockCount) : "-",
+      icon: "⚠️",
+      title: "Низкий остаток",
+      value: lowStockCount != null ? numFmt.format(lowStockCount) : "—",
+      description: "товаров ниже минимума",
     },
     {
-      title: "Просроченные товары",
-      value: expiredCount != null ? numFmt.format(expiredCount) : "-",
+      icon: "🚫",
+      title: "Просроченные",
+      value: expiredCount != null ? numFmt.format(expiredCount) : "—",
+      description: "требуют списания",
     },
   ];
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Dashboard</h2>
+      <div className={styles.pageHeader}>
+        <h2 className={styles.title}>Обзор склада</h2>
+        <p className={styles.subtitle}>Актуальная сводка по состоянию запасов</p>
+      </div>
 
       {loading ? (
-        <Loader />
+        <Loader text="Загрузка данных..." />
       ) : error ? (
         <ErrorMessage message={error} />
       ) : (

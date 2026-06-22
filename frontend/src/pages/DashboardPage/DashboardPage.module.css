@@ -1,18 +1,20 @@
 .container {
-  padding: 12px;
+  padding: 4px 0;
+}
+
+.pageHeader {
+  margin-bottom: 24px;
 }
 
 .title {
-  margin: 0 0 12px 0;
+  font-size: 22px;
+  font-weight: 700;
   color: var(--text-color);
+  letter-spacing: -0.3px;
 }
 
-.loading {
-  padding: 12px 0;
-  color: var(--text-color);
-}
-
-.error {
-  padding: 12px 0;
-  color: #b00020;
+.subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
 }

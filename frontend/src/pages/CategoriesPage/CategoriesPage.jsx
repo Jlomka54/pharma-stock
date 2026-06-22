@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import styles from "./CategoriesPage.module.css";
 import {
-  getCategories,
-  createCategory,
-  updateCategory,
-  deleteCategory,
+  getCategories, createCategory, updateCategory, deleteCategory,
 } from "../../services/categoryService";
 import Table from "../../components/Table/Table";
 import CategoryForm from "../../components/CategoryForm/CategoryForm";
@@ -24,64 +21,51 @@ export default function CategoriesPage() {
     setError(null);
     return getCategories()
       .then((data) => {
-        setCategories(
-          Array.isArray(data) ? data : data?.items || data?.data || [],
-        );
+        setCategories(Array.isArray(data) ? data : data?.items || data?.data || []);
       })
       .catch((err) => setError(err?.message || "Ошибка при загрузке категорий"))
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+  useEffect(() => { fetchCategories(); }, [fetchCategories]);
 
   const mapToInitial = (cat) => ({
-    CategoryName: cat.CategoryName || cat.name || cat.title || "",
-    Description: cat.Description || cat.description || cat.desc || "",
+    CategoryName: cat.CategoryName || cat.name || "",
+    Description: cat.Description || cat.description || "",
   });
 
   const handleCreateOrUpdate = async (vals) => {
-    try {
-      if (editingCategory) {
-        const id =
-          editingCategory.CategoryId ??
-          editingCategory.id ??
-          editingCategory._id;
-        await updateCategory(id, vals);
-        setEditingCategory(null);
-      } else {
-        await createCategory(vals);
-      }
-      await fetchCategories();
-      setFormKey((k) => k + 1);
-    } catch (err) {
-      throw err;
+    if (editingCategory) {
+      const id = editingCategory.CategoryId ?? editingCategory.id ?? editingCategory._id;
+      await updateCategory(id, vals);
+      setEditingCategory(null);
+    } else {
+      await createCategory(vals);
     }
+    await fetchCategories();
+    setFormKey((k) => k + 1);
   };
 
   const handleEditClick = (row) => {
     setEditingCategory(row);
     setFormKey((k) => k + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCategory(null);
+    setFormKey((k) => k + 1);
   };
 
   const handleDeleteClick = async (row) => {
-    const ok = window.confirm("Удалить категорию?");
-    if (!ok) return;
+    if (!window.confirm("Удалить категорию?")) return;
     try {
       await deleteCategory(row.CategoryId ?? row.id ?? row._id);
       await fetchCategories();
     } catch (err) {
       const msg = err?.response?.data?.message || err?.message || String(err);
-      if (
-        /foreign/i.test(msg) ||
-        /constraint/i.test(msg) ||
-        /foreign key/i.test(msg) ||
-        /related/i.test(msg)
-      ) {
-        alert(
-          "Нельзя удалить категорию, потому что она используется в товарах.",
-        );
+      if (/foreign|constraint|related/i.test(msg)) {
+        alert("Нельзя удалить категорию: она используется в товарах.");
       } else {
         alert(msg);
       }
@@ -91,26 +75,19 @@ export default function CategoriesPage() {
   const columns = [
     { key: "CategoryId", title: "ID" },
     {
-      key: "CategoryName",
-      title: "Название категории",
-      render: (r) => r.CategoryName ?? r.name ?? r.title ?? "-",
+      key: "CategoryName", title: "Название",
+      render: (r) => r.CategoryName ?? r.name ?? "—",
     },
     {
-      key: "Description",
-      title: "Описание",
-      render: (r) => r.Description ?? r.description ?? r.desc ?? "-",
+      key: "Description", title: "Описание",
+      render: (r) => r.Description ?? r.description ?? "—",
     },
     {
-      key: "actions",
-      title: "Действия",
+      key: "actions", title: "Действия",
       render: (r) => (
         <div className={styles.actionButtons}>
-          <Button variant="secondary" onClick={() => handleEditClick(r)}>
-            Редактировать
-          </Button>
-          <Button variant="danger" onClick={() => handleDeleteClick(r)}>
-            Удалить
-          </Button>
+          <Button variant="secondary" onClick={() => handleEditClick(r)}>Редактировать</Button>
+          <Button variant="danger" onClick={() => handleDeleteClick(r)}>Удалить</Button>
         </div>
       ),
     },
@@ -118,33 +95,32 @@ export default function CategoriesPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.headerRow}>
-        <h2 className={styles.title}>Категории</h2>
-        <div className={styles.actions}>
-          <Button variant="secondary" onClick={fetchCategories}>
-            Обновить
-          </Button>
+      <div className={styles.pageHeader}>
+        <div>
+          <h2 className={styles.title}>Категории</h2>
+          <p className={styles.subtitle}>Управление категориями товаров</p>
         </div>
+        <Button variant="secondary" onClick={fetchCategories}>Обновить</Button>
       </div>
 
       <div className={styles.formSection}>
-        <h3>
-          {editingCategory ? "Редактировать категорию" : "Создать категорию"}
-        </h3>
-        <CategoryForm
-          key={formKey}
-          initialValues={
-            editingCategory ? mapToInitial(editingCategory) : undefined
-          }
-          onSubmit={async (vals) => {
-            await handleCreateOrUpdate(vals);
-          }}
-          onCancel={() => {
-            setEditingCategory(null);
-            setFormKey((k) => k + 1);
-          }}
-          submitText={editingCategory ? "Сохранить" : "Создать"}
-        />
+        <div className={styles.formSectionHeader}>
+          <span className={styles.formSectionTitle}>
+            {editingCategory ? "✏️ Редактировать категорию" : "➕ Новая категория"}
+          </span>
+          {editingCategory && (
+            <Button variant="secondary" onClick={handleCancelEdit}>Отменить редактирование</Button>
+          )}
+        </div>
+        <div className={styles.formSectionBody}>
+          <CategoryForm
+            key={formKey}
+            initialValues={editingCategory ? mapToInitial(editingCategory) : undefined}
+            onSubmit={handleCreateOrUpdate}
+            onCancel={editingCategory ? handleCancelEdit : undefined}
+            submitText={editingCategory ? "Сохранить" : "Создать"}
+          />
+        </div>
       </div>
 
       {loading ? (
@@ -152,9 +128,7 @@ export default function CategoriesPage() {
       ) : error ? (
         <ErrorMessage message={error} />
       ) : (
-        <div className={styles.tableWrap}>
-          <Table columns={columns} data={categories} />
-        </div>
+        <Table columns={columns} data={categories} />
       )}
     </div>
   );

@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import styles from "./SuppliersPage.module.css";
 import {
-  getSuppliers,
-  createSupplier,
-  updateSupplier,
-  deleteSupplier,
+  getSuppliers, createSupplier, updateSupplier, deleteSupplier,
 } from "../../services/supplierService";
 import Table from "../../components/Table/Table";
 import SupplierForm from "../../components/SupplierForm/SupplierForm";
@@ -24,68 +21,48 @@ export default function SuppliersPage() {
     setError(null);
     return getSuppliers()
       .then((data) =>
-        setSuppliers(
-          Array.isArray(data) ? data : data?.items || data?.data || [],
-        ),
+        setSuppliers(Array.isArray(data) ? data : data?.items || data?.data || []),
       )
-      .catch((err) =>
-        setError(err?.message || "Ошибка при загрузке поставщиков"),
-      )
+      .catch((err) => setError(err?.message || "Ошибка при загрузке поставщиков"))
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    fetchSuppliers();
-  }, [fetchSuppliers]);
+  useEffect(() => { fetchSuppliers(); }, [fetchSuppliers]);
 
   const mapToInitial = (s) => ({
-    SupplierName: s.SupplierName || s.name || s.title || "",
-    Phone: s.Phone || s.phone || s.tel || "",
+    SupplierName: s.SupplierName || s.name || "",
+    Phone: s.Phone || s.phone || "",
     Email: s.Email || s.email || "",
     Address: s.Address || s.address || "",
   });
 
   const handleCreateOrUpdate = async (vals) => {
-    try {
-      if (editingSupplier) {
-        const id =
-          editingSupplier.SupplierId ??
-          editingSupplier.id ??
-          editingSupplier._id;
-        await updateSupplier(id, vals);
-        setEditingSupplier(null);
-      } else {
-        await createSupplier(vals);
-      }
-      await fetchSuppliers();
-      setFormKey((k) => k + 1);
-    } catch (err) {
-      throw err;
+    if (editingSupplier) {
+      const id = editingSupplier.SupplierId ?? editingSupplier.id ?? editingSupplier._id;
+      await updateSupplier(id, vals);
+      setEditingSupplier(null);
+    } else {
+      await createSupplier(vals);
     }
+    await fetchSuppliers();
+    setFormKey((k) => k + 1);
   };
 
   const handleEditClick = (row) => {
     setEditingSupplier(row);
     setFormKey((k) => k + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDeleteClick = async (row) => {
-    const ok = window.confirm("Удалить поставщика?");
-    if (!ok) return;
+    if (!window.confirm("Удалить поставщика?")) return;
     try {
       await deleteSupplier(row.SupplierId ?? row.id ?? row._id);
       await fetchSuppliers();
     } catch (err) {
       const msg = err?.response?.data?.message || err?.message || String(err);
-      if (
-        /foreign/i.test(msg) ||
-        /constraint/i.test(msg) ||
-        /foreign key/i.test(msg) ||
-        /related/i.test(msg)
-      ) {
-        alert(
-          "Нельзя удалить поставщика, потому что он используется в товарах.",
-        );
+      if (/foreign|constraint|related/i.test(msg)) {
+        alert("Нельзя удалить поставщика: он используется в товарах.");
       } else {
         alert(msg);
       }
@@ -94,37 +71,16 @@ export default function SuppliersPage() {
 
   const columns = [
     { key: "SupplierId", title: "ID" },
+    { key: "SupplierName", title: "Поставщик", render: (r) => r.SupplierName ?? r.name ?? "—" },
+    { key: "Phone", title: "Телефон", render: (r) => r.Phone ?? r.phone ?? "—" },
+    { key: "Email", title: "Email", render: (r) => r.Email ?? r.email ?? "—" },
+    { key: "Address", title: "Адрес", render: (r) => r.Address ?? r.address ?? "—" },
     {
-      key: "SupplierName",
-      title: "Название поставщика",
-      render: (r) => r.SupplierName ?? r.name ?? r.title ?? "-",
-    },
-    {
-      key: "Phone",
-      title: "Телефон",
-      render: (r) => r.Phone ?? r.phone ?? r.tel ?? "-",
-    },
-    {
-      key: "Email",
-      title: "Email",
-      render: (r) => r.Email ?? r.email ?? "-",
-    },
-    {
-      key: "Address",
-      title: "Адрес",
-      render: (r) => r.Address ?? r.address ?? "-",
-    },
-    {
-      key: "actions",
-      title: "Действия",
+      key: "actions", title: "Действия",
       render: (r) => (
         <div className={styles.actionButtons}>
-          <Button variant="secondary" onClick={() => handleEditClick(r)}>
-            Редактировать
-          </Button>
-          <Button variant="danger" onClick={() => handleDeleteClick(r)}>
-            Удалить
-          </Button>
+          <Button variant="secondary" onClick={() => handleEditClick(r)}>Редактировать</Button>
+          <Button variant="danger" onClick={() => handleDeleteClick(r)}>Удалить</Button>
         </div>
       ),
     },
@@ -132,33 +88,34 @@ export default function SuppliersPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.headerRow}>
-        <h2 className={styles.title}>Поставщики</h2>
-        <div className={styles.actions}>
-          <Button variant="secondary" onClick={fetchSuppliers}>
-            Обновить
-          </Button>
+      <div className={styles.pageHeader}>
+        <div>
+          <h2 className={styles.title}>Поставщики</h2>
+          <p className={styles.subtitle}>Управление поставщиками медикаментов</p>
         </div>
+        <Button variant="secondary" onClick={fetchSuppliers}>Обновить</Button>
       </div>
 
       <div className={styles.formSection}>
-        <h3>
-          {editingSupplier ? "Редактировать поставщика" : "Создать поставщика"}
-        </h3>
-        <SupplierForm
-          key={formKey}
-          initialValues={
-            editingSupplier ? mapToInitial(editingSupplier) : undefined
-          }
-          onSubmit={async (vals) => {
-            await handleCreateOrUpdate(vals);
-          }}
-          onCancel={() => {
-            setEditingSupplier(null);
-            setFormKey((k) => k + 1);
-          }}
-          submitText={editingSupplier ? "Сохранить" : "Создать"}
-        />
+        <div className={styles.formSectionHeader}>
+          <span className={styles.formSectionTitle}>
+            {editingSupplier ? "✏️ Редактировать поставщика" : "➕ Новый поставщик"}
+          </span>
+          {editingSupplier && (
+            <Button variant="secondary" onClick={() => { setEditingSupplier(null); setFormKey(k => k + 1); }}>
+              Отменить редактирование
+            </Button>
+          )}
+        </div>
+        <div className={styles.formSectionBody}>
+          <SupplierForm
+            key={formKey}
+            initialValues={editingSupplier ? mapToInitial(editingSupplier) : undefined}
+            onSubmit={handleCreateOrUpdate}
+            onCancel={editingSupplier ? () => { setEditingSupplier(null); setFormKey(k => k + 1); } : undefined}
+            submitText={editingSupplier ? "Сохранить" : "Создать"}
+          />
+        </div>
       </div>
 
       {loading ? (
@@ -166,9 +123,7 @@ export default function SuppliersPage() {
       ) : error ? (
         <ErrorMessage message={error} />
       ) : (
-        <div className={styles.tableWrap}>
-          <Table columns={columns} data={suppliers} />
-        </div>
+        <Table columns={columns} data={suppliers} />
       )}
     </div>
   );

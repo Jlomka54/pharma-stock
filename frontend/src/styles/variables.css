@@ -1,30 +1,74 @@
-/* CSS variables for the app */
 :root {
-  --color-primary: #0f62fe;
-  --color-secondary: #198754;
-  --bg-color: #f7fafc;
-  --text-color: #0f1724;
+  /* Palette: чистый фармацевтический стиль — белый, глубокий синий, зелёный акцент */
+  --color-primary: #1a56db;
+  --color-primary-hover: #1448c2;
+  --color-primary-light: #ebf0ff;
+  --color-secondary: #0e9f6e;
+  --color-secondary-hover: #0b8a5e;
+  --color-danger: #e02424;
+  --color-danger-hover: #c81e1e;
+  --color-warning: #ff8800;
+  --color-warning-bg: #fff8ee;
+
+  /* Backgrounds */
+  --bg-color: #f1f5f9;
+  --bg-sidebar: #0f172a;
   --card-color: #ffffff;
-  --border-color: #e6e9ee;
-  --border-radius: 8px;
-  --box-shadow:
-    0 1px 3px rgba(16, 24, 40, 0.05), 0 1px 2px rgba(16, 24, 40, 0.06);
-  --transition: 200ms ease-in-out;
-  --text-muted: rgba(15, 23, 36, 0.6);
-  --muted-bg: rgba(0, 0, 0, 0.02);
-  --muted-border: rgba(0, 0, 0, 0.1);
+
+  /* Text */
+  --text-color: #0f172a;
+  --text-muted: #64748b;
+  --text-on-primary: #ffffff;
+  --text-sidebar: #94a3b8;
+  --text-sidebar-active: #ffffff;
+
+  /* Borders */
+  --border-color: #e2e8f0;
+  --border-radius: 10px;
+  --border-radius-sm: 6px;
+
+  /* Shadows */
+  --box-shadow: 0 1px 3px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --box-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.1), 0 2px 4px rgba(15, 23, 42, 0.06);
+
+  /* Misc */
+  --transition: 160ms ease;
+  --muted-bg: #f8fafc;
+  --muted-border: #cbd5e1;
+  --sidebar-width: 240px;
+  --header-height: 60px;
+
+  /* Status colors */
+  --status-ok: #0e9f6e;
+  --status-ok-bg: #f0fdf4;
+  --status-low: #ff8800;
+  --status-low-bg: #fff8ee;
+  --status-critical: #e02424;
+  --status-critical-bg: #fef2f2;
+  --status-expired: #7c3aed;
+  --status-expired-bg: #f5f3ff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-primary: #c084fc;
-    --color-secondary: #198754;
-    --bg-color: #16171d;
-    --text-color: #e6eef6;
-    --text-muted: rgba(230, 238, 246, 0.6);
-    --muted-bg: rgba(255, 255, 255, 0.02);
-    --muted-border: rgba(255, 255, 255, 0.08);
-    --card-color: #1f2028;
-    --border-color: #2e303a;
+    --color-primary: #3b82f6;
+    --color-primary-hover: #2563eb;
+    --color-primary-light: #1e3a5f;
+    --color-secondary: #10b981;
+    --color-secondary-hover: #059669;
+
+    --bg-color: #0d1117;
+    --bg-sidebar: #161b27;
+    --card-color: #1a2030;
+
+    --text-color: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-sidebar: #64748b;
+    --text-sidebar-active: #f1f5f9;
+
+    --border-color: #2d3748;
+    --muted-bg: #141922;
+    --muted-border: #374151;
+    --box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 }
