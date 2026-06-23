@@ -29,12 +29,12 @@ export default function SuppliersPage() {
 
   useEffect(() => { fetchSuppliers(); }, [fetchSuppliers]);
 
-  const mapToInitial = (s) => ({
+  const mapToInitial = React.useCallback((s) => ({
     SupplierName: s.SupplierName || s.name || "",
     Phone: s.Phone || s.phone || "",
     Email: s.Email || s.email || "",
     Address: s.Address || s.address || "",
-  });
+  }), []);
 
   const handleCreateOrUpdate = async (vals) => {
     if (editingSupplier) {

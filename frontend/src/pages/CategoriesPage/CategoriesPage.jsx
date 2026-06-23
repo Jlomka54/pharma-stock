@@ -29,10 +29,10 @@ export default function CategoriesPage() {
 
   useEffect(() => { fetchCategories(); }, [fetchCategories]);
 
-  const mapToInitial = (cat) => ({
+  const mapToInitial = React.useCallback((cat) => ({
     CategoryName: cat.CategoryName || cat.name || "",
     Description: cat.Description || cat.description || "",
-  });
+  }), []);
 
   const handleCreateOrUpdate = async (vals) => {
     if (editingCategory) {

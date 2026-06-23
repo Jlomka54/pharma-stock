@@ -24,10 +24,11 @@ export default function ProductForm({
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setValues({ ...emptyValues, ...initialValues });
     setErrors({});
-  }, [initialValues]);
+  }, [JSON.stringify(initialValues)]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

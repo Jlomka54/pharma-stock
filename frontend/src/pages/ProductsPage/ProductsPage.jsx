@@ -93,7 +93,7 @@ export default function ProductsPage() {
     setFormKey((k) => k + 1);
   };
 
-  const mapToInitial = (r) => ({
+  const mapToInitial = React.useCallback((r) => ({
     ProductName: r.ProductName || r.name || "",
     CategoryId: r.CategoryId ?? r.category?.id ?? r.categoryId ?? "",
     SupplierId: r.SupplierId ?? r.supplier?.id ?? r.supplierId ?? "",
@@ -109,7 +109,7 @@ export default function ProductsPage() {
         return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
       } catch { return String(d); }
     })(),
-  });
+  }), []);
 
   const numFmt = new Intl.NumberFormat("ru-RU");
 
